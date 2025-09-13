@@ -113,17 +113,17 @@ def add_produto():
         return jsonify({'erro': 'Dados inválidos ou ausentes'}), 400
 
     novo_produto = Produto(
-    nome=nome,
-    quantidade=quantidade,
-    preco=preco,
-    validade=validade  
-)
-db.session.add(novo_produto)
-db.session.commit()
-return jsonify({
-    "id": novo_produto.id,
-    "mensagem": "Produto adicionado com sucesso"
-}), 201
+        nome=nome,
+        quantidade=quantidade,
+        preco=preco,
+        validade=validade  
+    )
+    db.session.add(novo_produto)
+    db.session.commit()
+    return jsonify({
+        "id": novo_produto.id,
+        "mensagem": "Produto adicionado com sucesso"
+    }), 201
 
 
 
@@ -134,14 +134,16 @@ def editar_produto(id):
     produto = Produto.query.get_or_404(id)
     data = request.get_json()
 
-     try:
+    try:
         produto.quantidade = int(data['quantidade'])
         produto.preco = float(str(data['preco']).replace(',', '.'))
         produto.validade = datetime.strptime(data['validade'], '%Y-%m-%d').date()
 
         if produto.quantidade <= 0 or produto.preco < 0:
             return jsonify({'erro': 'Quantidade e preço devem ser positivos'}), 400
-        
+    except (KeyError, ValueError):
+        return jsonify({'erro': 'Dados inválidos ou ausentes'}), 400    
+
 # PUT - atualizar produto
 @app.route('/produtos/<int:id>', methods=['PUT'])
 @login_requerido
